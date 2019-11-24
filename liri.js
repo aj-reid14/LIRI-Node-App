@@ -1,5 +1,6 @@
 require("dotenv").config();
 const axios = require("axios");
+const fs = require("fs");
 const Spotify = require("node-spotify-api");
 const moment = require("moment");
 moment().format();
@@ -22,6 +23,7 @@ switch (action) {
         MovieThis(search.join("+"));
         break;
     case "do-what-it-says":
+        DoWhatItSays();
         break;
 }
 
@@ -36,6 +38,7 @@ function ConcertThis(q) {
 
         if (!event) {
             console.log("No Results");
+            console.log('------------------------------');
         } else {
             console.log(event.artist.name);
             console.log(`Venue: ${event.venue.name}`);
@@ -43,11 +46,11 @@ function ConcertThis(q) {
 
             let date = moment(event.datetime).format('MM/DD/YYYY');
             console.log(`Date: ${date}`);
+            console.log('------------------------------');
         }
 
     });
 
-    console.log('------------------------------');
 
 }
 
@@ -61,6 +64,7 @@ function SpotifyThisSong(q) {
         console.log("'The Sign'");
         console.log("Preview: https://open.spotify.com/album/5UwIyIyFzkM7wKeGtRJPgB");
         console.log("Album: The Sign (US Album)");
+        console.log('------------------------------');
 
     } else {
 
@@ -74,18 +78,19 @@ function SpotifyThisSong(q) {
 
             if (!song) {
                 console.log("No Results");
+                console.log('------------------------------');
             } else {
 
                 console.log(`Artist: ${song.artists[0].name}`);
                 console.log(`'${song.name}'`);
                 console.log(`Preview: ${song.external_urls.spotify}`);
                 console.log(`Album: ${song.album.name}`);
+                console.log('------------------------------');
             }
 
             
         });
     }
-    console.log('------------------------------');
     
 }
 
@@ -114,5 +119,29 @@ function MovieThis(q) {
 }
 
 function DoWhatItSays() {
+
+    fs.readFile("random.txt", "utf8", function(err, data) {
+        if (err)
+            return console.log(err);
+
+        let commandList = data.split("\r\n");
+        let randCommandID = Math.floor(Math.random() * commandList.length);
+        let randCommand = commandList[randCommandID].split(",");
+
+        // Remove quotations from search query in .txt file
+        let query = randCommand[1].substring(1, randCommand[1].length - 1);
+
+        switch (randCommand[0]) {
+            case "concert-this":
+                    ConcertThis(query);
+                    break;
+                case "spotify-this-song":
+                    SpotifyThisSong(query);
+                    break;
+                case "movie-this":
+                    MovieThis(query);
+                    break;
+        }
+    })
 
 }
