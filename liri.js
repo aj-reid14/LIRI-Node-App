@@ -19,6 +19,7 @@ switch (action) {
         SpotifyThisSong(search.join(" "));
         break;
     case "movie-this":
+        MovieThis(search.join("+"));
         break;
     case "do-what-it-says":
         break;
@@ -26,56 +27,89 @@ switch (action) {
 
 function ConcertThis(q) {
 
-    axios.get(`https://rest.bandsintown.com/artists/${q}/events?app_id=codingbootcamp`).then(function(response) {
-
-    let event = response.data[0];
-
     console.log('------------------------------');
 
-    if (!event) {
-        console.log("No Results");
-    } else {
-        console.log(event.artist.name);
-        console.log(`Venue: ${event.venue.name}`);
-        console.log(`Location: ${event.venue.city}, ${event.venue.region}`);
+    axios.get(`https://rest.bandsintown.com/artists/${q}/events?app_id=codingbootcamp`).then(function (response) {
 
-        let date = moment(event.datetime).format('MM/DD/YYYY');
-        console.log(`Date: ${date}`);
-    }
+        let event = response.data[0];
 
-    console.log('------------------------------');
+
+        if (!event) {
+            console.log("No Results");
+        } else {
+            console.log(event.artist.name);
+            console.log(`Venue: ${event.venue.name}`);
+            console.log(`Location: ${event.venue.city}, ${event.venue.region}`);
+
+            let date = moment(event.datetime).format('MM/DD/YYYY');
+            console.log(`Date: ${date}`);
+        }
+
     });
+
+    console.log('------------------------------');
 
 }
 
 function SpotifyThisSong(q) {
 
-    spotify.search({type: 'track', query: q}, function(err, data) {
-        if (err) {
-            return console.log("Error Occured: " + err);
-        }
+    console.log('------------------------------');
 
-        let song = data.tracks.items[0];
+    if (!q) {
 
-        console.log('------------------------------');
+        console.log("Artist: Ace of Base");
+        console.log("'The Sign'");
+        console.log("Preview: https://open.spotify.com/album/5UwIyIyFzkM7wKeGtRJPgB");
+        console.log("Album: The Sign (US Album)");
 
-        if (!song) {
-            console.log("No Results");
-        } else {
+    } else {
 
-            console.log(`Artist: ${song.artists[0].name}`);
-            console.log(`'${song.name}'`);
-            console.log(`Preview: ${song.external_urls.spotify}`);
-            console.log(`Album: ${song.album.name}`);
-        }
+        spotify.search({ type: 'track', query: q }, function (err, data) {
+            if (err) {
+                return console.log("Error Occured: " + err);
+            }
 
-        console.log('------------------------------');
+            let song = data.tracks.items[0];
 
-    });
 
+            if (!song) {
+                console.log("No Results");
+            } else {
+
+                console.log(`Artist: ${song.artists[0].name}`);
+                console.log(`'${song.name}'`);
+                console.log(`Preview: ${song.external_urls.spotify}`);
+                console.log(`Album: ${song.album.name}`);
+            }
+
+            
+        });
+    }
+    console.log('------------------------------');
+    
 }
 
-function MovieThis() {
+function MovieThis(q) {
+
+    if (!q)
+    q = "mr+nobody";
+
+    console.log('------------------------------');
+
+    axios.get(`http://www.omdbapi.com/?apikey=trilogy&t=${q}`).then(function (response) {
+
+        let movie = response.data;
+
+        console.log(`'${movie.Title}'`);
+        console.log(`Released: ${movie.Year}`);
+        console.log(`Rating: ${movie.imdbRating}`);
+        console.log(`Rotten Tomatoes: ${movie.Ratings[1].Value}`);
+        console.log(`Country: ${movie.Country}`);
+        console.log(`Language: ${movie.Language}`);
+        console.log(`Plot: ${movie.Plot}`);
+        console.log(`Cast: ${movie.Actors}`);
+        console.log('------------------------------');
+    })
 
 }
 
